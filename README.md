@@ -15,3 +15,8 @@ i wanted it to have
 - the viewer.
 
 this counts as badge hacking ok
+
+## firmware
+
+The custom firmware itself (the thing that actually makes the badge do this) lives in
+[firmware/](firmware/) - prebuilt `.uf2` files you can flash onto your own Baosec-lite badge.
