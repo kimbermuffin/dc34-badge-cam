@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Photos captured on a DEF CON 34 Baosec-lite badge camera.">
+<title>FRAME LOG — baosec-lite</title>
+<style>
+  :root {
+    --bg: #0a0d0a;
+    --bg-soft: #0e120e;
+    --card: #12160f;
+    --card-line: #262c22;
+    --ink: #e8ecdf;
+    --ink-dim: #8a9280;
+    --ink-faint: #565f4f;
+    --accent: #ffb020;
+    --accent-dim: #6b551c;
+    --rec: #ff5252;
+    --focus: #ffb020;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(var(--card-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--card-line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.05;
+  }
+
+  .scrim {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ---------- header ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(to bottom, rgba(10,13,10,0.97), rgba(10,13,10,0.88));
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--card-line);
+  }
+  .header-inner {
+    width: 100%;
+    max-width: 460px;
+    padding: 14px 18px 12px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .brand-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rec);
+    box-shadow: 0 0 6px 1px rgba(255,82,82,0.6);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .brand-dot { animation: pulse 2.4s ease-in-out infinite; }
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .brand-name {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .brand-sub {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+  .frame-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.03em;
+    text-align: right;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .frame-count b { color: var(--accent); font-weight: 600; }
+
+  /* ---------- feed ---------- */
+  main {
+    width: 100%;
+    max-width: 460px;
+    padding: 20px 14px 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 3px;
+    margin-bottom: 22px;
+    overflow: hidden;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+  .card-meta .idx { color: var(--ink); font-weight: 600; }
+  .card-meta .idx span { color: var(--ink-faint); font-weight: 400; }
+
+  .frame {
+    position: relative;
+    aspect-ratio: 256 / 240;
+    background: #050604;
+    cursor: zoom-in;
+  }
+  .frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: contrast(1.05) brightness(1.02);
+  }
+  .frame .corner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 0 solid var(--accent);
+    opacity: 0.55;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+  .frame:hover .corner { opacity: 0.95; }
+  .corner.tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+  .corner.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+  .corner.bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+  .corner.br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+  .frame .osd {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(232,236,223,0.75);
+    background: rgba(5,6,4,0.55);
+    padding: 2px 5px;
+    letter-spacing: 0.03em;
+    border-radius: 2px;
+  }
+
+  .heart-burst {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .heart-burst svg { width: 64px; height: 64px; opacity: 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .heart-burst.play svg {
+      animation: burst 0.65s cubic-bezier(.2,1.4,.4,1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .heart-burst.play svg { animation: burstFade 0.5s ease-out; }
+  }
+  @keyframes burst {
+    0% { opacity: 0; transform: scale(0.3); }
+    35% { opacity: 0.95; transform: scale(1.05); }
+    60% { opacity: 0.95; transform: scale(0.96); }
+    100% { opacity: 0; transform: scale(0.9); }
+  }
+  @keyframes burstFade {
+    0% { opacity: 0; } 40% { opacity: 0.9; } 100% { opacity: 0; }
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px 4px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: var(--ink-dim);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    padding: 4px 2px;
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+  .flag-btn.active { color: var(--accent); }
+  .flag-btn .icon-fill { display: none; }
+  .flag-btn.active .icon-outline { display: none; }
+  .flag-btn.active .icon-fill { display: inline; }
+  .btn.dl:hover { color: var(--ink); }
+  .btn.flag-btn:hover { color: var(--accent); }
+
+  .caption {
+    padding: 6px 12px 14px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--ink-dim);
+    letter-spacing: 0.01em;
+  }
+  .caption .tag { color: var(--ink); }
+
+  /* ---------- footer ---------- */
+  footer {
+    width: 100%;
+    max-width: 460px;
+    padding: 10px 18px 40px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.03em;
+    line-height: 1.7;
+    position: relative;
+    z-index: 1;
+  }
+  footer .rule {
+    width: 40px;
+    height: 1px;
+    background: var(--card-line);
+    margin: 0 auto 14px;
+  }
+
+  /* ---------- lightbox ---------- */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(5,6,4,0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.18s ease;
+  }
+  .lightbox.open { opacity: 1; visibility: visible; }
+  .lightbox-inner {
+    max-width: min(92vw, 640px);
+    width: 100%;
+    padding: 0 16px;
+  }
+  .lightbox-frame {
+    position: relative;
+    background: #050604;
+    border: 1px solid var(--card-line);
+  }
+  .lightbox-frame img {
+    width: 100%;
+    display: block;
+    image-rendering: pixelated;
+  }
+  .lightbox-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 12px 2px 0;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+  .lightbox-meta b { color: var(--accent); }
+  .lb-close, .lb-nav {
+    position: fixed;
+    background: none;
+    border: none;
+    color: var(--ink-dim);
+    cursor: pointer;
+    padding: 10px;
+  }
+  .lb-close:hover, .lb-nav:hover { color: var(--ink); }
+  .lb-close { top: 14px; right: 14px; }
+  .lb-close svg { width: 22px; height: 22px; }
+  .lb-nav svg { width: 28px; height: 28px; }
+  .lb-prev { left: 6px; top: 50%; transform: translateY(-50%); }
+  .lb-next { right: 6px; top: 50%; transform: translateY(-50%); }
+  @media (max-width: 560px) {
+    .lb-prev { left: 2px; }
+    .lb-next { right: 2px; }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+  }
+</style>
+</head>
+<body>
+<div class="scrim">
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <div>
+          <div class="brand-name">frame_log</div>
+          <div class="brand-sub">baosec&#8209;lite &middot; onboard cam</div>
+        </div>
+      </div>
+      <div class="frame-count"><b id="count">0</b> frames<br>256&times;240 &middot; 8bpp mono</div>
+    </div>
+  </header>
+
+  <main id="feed"></main>
+
+  <footer>
+    <div class="rule"></div>
+    Pulled over USB-CDC from a DEF CON 34 badge (Baochip Baosec&#8209;lite).<br>
+    Grayscale CMOS frames, no post-processing.
+  </footer>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Frame viewer">
+  <button class="lb-close" id="lbClose" aria-label="Close viewer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 5l14 14M19 5L5 19"/></svg>
+  </button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 4l-8 8 8 8"/></svg>
+  </button>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Next frame">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 4l8 8-8 8"/></svg>
+  </button>
+  <div class="lightbox-inner">
+    <div class="lightbox-frame">
+      <img id="lbImg" src="" alt="">
+    </div>
+    <div class="lightbox-meta">
+      <span>slot <b id="lbSlot">00</b></span>
+      <span id="lbTime"></span>
+      <span id="lbSize"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PHOTOS = [{"slot": 0, "size_kb": 79.4, "time": "Aug 13", "data": "images/photo_0.png"}, {"slot": 1, "size_kb": 75.8, "time": "Aug 13", "data": "images/photo_1.png"}, {"slot": 2, "size_kb": 50.4, "time": "Aug 13", "data": "images/photo_2.png"}, {"slot": 3, "size_kb": 51.8, "time": "Aug 13", "data": "images/photo_3.png"}, {"slot": 4, "size_kb": 78.6, "time": "Aug 13", "data": "images/photo_4.png"}, {"slot": 5, "size_kb": 77.8, "time": "Aug 13", "data": "images/photo_5.png"}, {"slot": 6, "size_kb": 73.8, "time": "Aug 13", "data": "images/photo_6.png"}, {"slot": 7, "size_kb": 70.8, "time": "Aug 13", "data": "images/photo_7.png"}, {"slot": 8, "size_kb": 54.4, "time": "Aug 13", "data": "images/photo_8.png"}, {"slot": 9, "size_kb": 53.0, "time": "Aug 13", "data": "images/photo_9.png"}, {"slot": 10, "size_kb": 80.4, "time": "Aug 13", "data": "images/photo_10.png"}, {"slot": 11, "size_kb": 76.2, "time": "Aug 13", "data": "images/photo_11.png"}];
+
+  const LIKE_KEY = "frame_log_likes";
+  function getLikes() {
+    try { return JSON.parse(localStorage.getItem(LIKE_KEY) || "{}"); }
+    catch (e) { return {}; }
+  }
+  function setLiked(slot, val) {
+    const likes = getLikes();
+    likes[slot] = val;
+    try { localStorage.setItem(LIKE_KEY, JSON.stringify(likes)); } catch (e) {}
+  }
+
+  const OUTLINE_FLAG = `<svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3v18M5 4h11l-2.2 3.5L16 11H5"/></svg>`;
+  const FILL_FLAG = `<svg class="icon-fill" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3v18h1.4V4h9.1l-2.2 3.5L15.5 11H6.4v1.4H16a.7.7 0 00.58-1.1L14 7.5l2.58-3.8A.7.7 0 0016 2.6H5.7A.7.7 0 005 3.3z"/></svg>`;
+  const DL_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v13m0 0l-5-5m5 5l5-5M4 20h16"/></svg>`;
+  const HEART_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.4"><path d="M12 20s-7.5-4.6-10-9.3C.5 7.6 2.3 4 5.9 4c2 0 3.5 1.1 4.1 2.6C10.6 5.1 12.1 4 14.1 4c3.6 0 5.4 3.6 3.9 6.7C15.5 15.4 12 20 12 20z"/></svg>`;
+
+  const feed = document.getElementById("feed");
+  document.getElementById("count").textContent = PHOTOS.length;
+
+  const likes = getLikes();
+
+  PHOTOS.forEach((p, idx) => {
+    const card = document.createElement("article");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="card-meta">
+        <span class="idx">${String(idx + 1).padStart(2,"0")}<span> / ${String(PHOTOS.length).padStart(2,"0")}</span></span>
+        <span>${p.time}</span>
+      </div>
+      <div class="frame" data-idx="${idx}" tabindex="0" role="button" aria-label="Open frame ${idx + 1} full size">
+        <img src="${p.data}" alt="Camera frame from badge slot ${p.slot}" loading="lazy">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <span class="osd">slot ${String(p.slot).padStart(2,"0")}</span>
+        <span class="heart-burst">${HEART_ICON}</span>
+      </div>
+      <div class="actions">
+        <button class="btn flag-btn" data-slot="${p.slot}" aria-pressed="false" aria-label="Flag this frame">
+          ${OUTLINE_FLAG}${FILL_FLAG}<span class="like-count">0</span>
+        </button>
+        <a class="btn dl" href="${p.data}" download="badge_frame_${String(p.slot).padStart(2,"0")}.png" aria-label="Download frame">
+          ${DL_ICON}<span>save</span>
+        </a>
+      </div>
+      <div class="caption"><span class="tag">frame_log</span> &middot; ${p.size_kb} KB raw &middot; captured on&#8209;device, pulled over serial</div>
+    `;
+    feed.appendChild(card);
+
+    const flagBtn = card.querySelector(".flag-btn");
+    const countEl = card.querySelector(".like-count");
+    const frameEl = card.querySelector(".frame");
+    const burst = card.querySelector(".heart-burst");
+
+    function paint() {
+      const on = !!likes[p.slot];
+      flagBtn.classList.toggle("active", on);
+      flagBtn.setAttribute("aria-pressed", on ? "true" : "false");
+      countEl.textContent = on ? "1" : "0";
+    }
+    paint();
+
+    function toggle(forceOn) {
+      const next = forceOn === undefined ? !likes[p.slot] : forceOn;
+      if (likes[p.slot] === next) {
+        if (!next) return;
+      }
+      likes[p.slot] = next;
+      setLiked(p.slot, next);
+      paint();
+      if (next) {
+        burst.classList.remove("play");
+        requestAnimationFrame(() => burst.classList.add("play"));
+      }
+    }
+
+    flagBtn.addEventListener("click", () => toggle());
+    frameEl.addEventListener("dblclick", (e) => { e.preventDefault(); toggle(true); });
+
+    let lastTap = 0;
+    frameEl.addEventListener("touchend", () => {
+      const now = Date.now();
+      if (now - lastTap < 320) toggle(true);
+      lastTap = now;
+    });
+
+    frameEl.addEventListener("click", (e) => {
+      if (Date.now() - lastTap < 320) return;
+      openLightbox(idx);
+    });
+    frameEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openLightbox(idx); }
+    });
+  });
+
+  // ---------- lightbox ----------
+  const lb = document.getElementById("lightbox");
+  const lbImg = document.getElementById("lbImg");
+  const lbSlot = document.getElementById("lbSlot");
+  const lbTime = document.getElementById("lbTime");
+  const lbSize = document.getElementById("lbSize");
+  let current = 0;
+
+  function renderLightbox() {
+    const p = PHOTOS[current];
+    lbImg.src = p.data;
+    lbImg.alt = `Camera frame from badge slot ${p.slot}, full size`;
+    lbSlot.textContent = String(p.slot).padStart(2, "0");
+    lbTime.textContent = p.time;
+    lbSize.textContent = p.size_kb + " KB";
+  }
+  function openLightbox(idx) {
+    current = idx;
+    renderLightbox();
+    lb.classList.add("open");
+    document.body.style.overflow = "hidden";
+    document.getElementById("lbClose").focus();
+  }
+  function closeLightbox() {
+    lb.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  function step(dir) {
+    current = (current + dir + PHOTOS.length) % PHOTOS.length;
+    renderLightbox();
+  }
+
+  document.getElementById("lbClose").addEventListener("click", closeLightbox);
+  document.getElementById("lbPrev").addEventListener("click", () => step(-1));
+  document.getElementById("lbNext").addEventListener("click", () => step(1));
+  lb.addEventListener("click", (e) => { if (e.target === lb) closeLightbox(); });
+  document.addEventListener("keydown", (e) => {
+    if (!lb.classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") step(-1);
+    if (e.key === "ArrowRight") step(1);
+  });
+</script>
+</body>
+</html>
