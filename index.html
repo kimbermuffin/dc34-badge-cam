@@ -1,688 +1,306 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="description" content="Photos captured on a DEF CON 34 Baosec-lite badge camera.">
-<title>~*~ FRAME LOG ~*~ Baosec-Lite Photo Page ~*~</title>
-<style>
-  :root {
-    --face: #c0c0c0;
-    --face-hi: #ffffff;
-    --face-lo: #808080;
-    --face-dk: #404040;
-    --winbg: #ece9d8;
-    --page: #d6d2c4;
-    --ink: #000000;
-    --ink-dim: #444444;
-    --link: #0000ee;
-    --link-visited: #551a8b;
-    --accent: #ff0000;
-    --star: #ffcc00;
-    --lcd: #00ff66;
-    --serif: "Times New Roman", Times, Georgia, serif;
-    --sans: Verdana, Arial, Helvetica, sans-serif;
-  }
-
-  * { box-sizing: border-box; }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    background-color: var(--page);
-    background-image:
-      radial-gradient(circle at 3px 3px, rgba(0,0,0,0.06) 1px, transparent 1.4px);
-    background-size: 14px 14px;
-    color: var(--ink);
-    font-family: var(--serif);
-    font-size: 15px;
-  }
-
-  a { color: var(--link); }
-  a:visited { color: var(--link-visited); }
-  a:active { color: var(--accent); }
-
-  .blink {
-    animation: blink-anim 1.1s steps(1) infinite;
-  }
-  @keyframes blink-anim { 50% { opacity: 0; } }
-  @media (prefers-reduced-motion: reduce) {
-    .blink { animation: none; }
-  }
-
-  /* ---------- page shell: a big beveled "window" like an old dialog ---------- */
-  .shell {
-    max-width: 560px;
-    margin: 14px auto 40px;
-    background: var(--winbg);
-    border: 2px solid var(--face-dk);
-    box-shadow: inset 1px 1px 0 var(--face-hi), 3px 3px 8px rgba(0,0,0,0.35);
-    padding: 3px;
-  }
-
-  .construction {
-    background:
-      repeating-linear-gradient(45deg, #000 0 10px, #ffcc00 10px 20px);
-    color: #000;
-    font-family: var(--sans);
-    font-weight: bold;
-    font-size: 12px;
-    text-align: center;
-    padding: 5px 4px;
-    border: 2px outset #ffcc00;
-  }
-  .construction span {
-    background: var(--winbg);
-    padding: 1px 8px;
-    border: 1px solid #000;
-  }
-
-  header.titlebar {
-    background: linear-gradient(to bottom, #0a3fa8, #1655cf 45%, #7aa6e8);
-    color: #fff;
-    font-family: var(--sans);
-    font-weight: bold;
-    font-size: 13px;
-    padding: 4px 6px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    letter-spacing: 0.02em;
-  }
-  header.titlebar .winbtns span {
-    display: inline-block;
-    width: 16px;
-    height: 14px;
-    background: var(--face);
-    border: 1px solid #000;
-    box-shadow: inset 1px 1px 0 var(--face-hi), inset -1px -1px 0 var(--face-lo);
-    text-align: center;
-    line-height: 13px;
-    font-size: 10px;
-    color: #000;
-    margin-left: 3px;
-  }
-
-  .titlecard {
-    text-align: center;
-    padding: 18px 10px 8px;
-    background: var(--winbg);
-  }
-  .titlecard h1 {
-    margin: 0;
-    font-family: var(--serif);
-    font-size: 30px;
-    font-weight: bold;
-    letter-spacing: 0.01em;
-    background-image: linear-gradient(90deg, #ff0000, #ff9900, #33cc00, #0099ff, #cc00ff, #ff0000);
-    background-size: 250% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: rainbow-slide 6s linear infinite;
-    text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
-  }
-  @keyframes rainbow-slide {
-    0% { background-position: 0% 0; }
-    100% { background-position: 100% 0; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .titlecard h1 { animation: none; }
-  }
-  .titlecard .subtitle {
-    font-family: var(--sans);
-    font-size: 12px;
-    color: var(--ink-dim);
-    margin-top: 4px;
-  }
-  .titlecard hr {
-    border: none;
-    height: 4px;
-    margin: 12px auto;
-    width: 92%;
-    background: repeating-linear-gradient(90deg, #ff0000 0 8px, #ff9900 8px 16px, #ffee00 16px 24px, #33cc00 24px 32px, #0099ff 32px 40px, #cc00ff 40px 48px);
-  }
-
-  .marquee-wrap {
-    background: #000;
-    color: var(--lcd);
-    font-family: "Courier New", monospace;
-    font-size: 13px;
-    padding: 4px 0;
-    overflow: hidden;
-    white-space: nowrap;
-    border-top: 2px solid var(--face-dk);
-    border-bottom: 2px solid var(--face-dk);
-  }
-  .marquee-wrap .track {
-    display: inline-block;
-    padding-left: 100%;
-    animation: marquee-scroll 16s linear infinite;
-  }
-  @keyframes marquee-scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .marquee-wrap .track { animation: none; padding-left: 0; }
-  }
-
-  /* ---------- stats table ---------- */
-  .statsbar {
-    display: flex;
-    justify-content: space-between;
-    gap: 6px;
-    padding: 8px 10px;
-    background: var(--winbg);
-    font-family: var(--sans);
-    font-size: 11px;
-  }
-  .statsbar .cell {
-    flex: 1;
-    background: var(--face);
-    border: 2px inset var(--face);
-    padding: 4px 6px;
-    text-align: center;
-  }
-  .statsbar .cell b {
-    display: block;
-    font-family: "Courier New", monospace;
-    font-size: 15px;
-    color: #000;
-  }
-  .counter {
-    background: #000;
-    color: var(--lcd);
-    font-family: "Courier New", monospace;
-    font-size: 15px;
-    letter-spacing: 2px;
-    padding: 2px 4px;
-    display: inline-block;
-    border: 1px solid #444;
-  }
-
-  /* ---------- feed ---------- */
-  main {
-    padding: 10px 10px 4px;
-    background: var(--winbg);
-  }
-
-  .card {
-    background: var(--face);
-    border: 2px outset var(--face);
-    margin-bottom: 16px;
-    padding: 6px;
-  }
-
-  .card-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: var(--sans);
-    font-size: 11px;
-    color: #000;
-    background: var(--winbg);
-    border: 1px inset var(--face);
-    padding: 3px 6px;
-    margin-bottom: 5px;
-  }
-  .card-meta .idx { font-weight: bold; }
-
-  .frame {
-    position: relative;
-    aspect-ratio: 256 / 240;
-    background: #000;
-    cursor: zoom-in;
-    border: 3px solid #000;
-    outline: 1px solid var(--face-hi);
-  }
-  .frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .frame .osd {
-    position: absolute;
-    bottom: 6px;
-    left: 6px;
-    font-family: "Courier New", monospace;
-    font-size: 10px;
-    color: var(--lcd);
-    background: rgba(0,0,0,0.75);
-    padding: 1px 5px;
-    border: 1px solid #000;
-  }
-
-  .heart-burst {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    font-size: 56px;
-  }
-  .heart-burst span { opacity: 0; display: inline-block; }
-  @media (prefers-reduced-motion: no-preference) {
-    .heart-burst.play span { animation: burst 0.7s cubic-bezier(.2,1.4,.4,1); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .heart-burst.play span { animation: burstFade 0.5s ease-out; }
-  }
-  @keyframes burst {
-    0% { opacity: 0; transform: scale(0.3) rotate(-15deg); }
-    35% { opacity: 1; transform: scale(1.15) rotate(4deg); }
-    60% { opacity: 1; transform: scale(0.98) rotate(0deg); }
-    100% { opacity: 0; transform: scale(0.92); }
-  }
-  @keyframes burstFade { 0% { opacity: 0; } 40% { opacity: 0.9; } 100% { opacity: 0; } }
-
-  .actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 2px 2px;
-    font-family: var(--sans);
-  }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: var(--face);
-    border: 2px outset var(--face);
-    color: #000;
-    font-family: var(--sans);
-    font-size: 11px;
-    font-weight: bold;
-    cursor: pointer;
-    padding: 4px 9px;
-    text-decoration: none;
-  }
-  .btn:active { border-style: inset; }
-  .btn:focus-visible { outline: 1px dotted #000; outline-offset: 1px; }
-  .flag-btn.active { color: #a05a00; }
-  .flag-btn .star { color: var(--star); text-shadow: 0 0 1px #806000; }
-  .flag-btn:not(.active) .star { filter: grayscale(1) brightness(1.3); opacity: 0.6; }
-
-  .caption {
-    padding: 6px 2px 2px;
-    font-family: var(--sans);
-    font-size: 11px;
-    line-height: 1.5;
-    color: var(--ink-dim);
-  }
-  .caption .tag { color: var(--link-visited); font-weight: bold; }
-
-  /* ---------- webring / footer ---------- */
-  .webring {
-    background: var(--winbg);
-    border-top: 2px groove var(--face);
-    padding: 14px 12px;
-    text-align: center;
-    font-family: var(--sans);
-    font-size: 11px;
-  }
-  .webring .nav {
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  .webring .nav a { margin: 0 6px; }
-  .badges {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-    margin: 10px 0;
-  }
-  .badges .badge {
-    display: inline-block;
-    background: #000;
-    color: #fff;
-    font-family: "Courier New", monospace;
-    font-size: 10px;
-    font-weight: bold;
-    padding: 3px 6px;
-    border: 1px solid #666;
-    letter-spacing: 0.02em;
-  }
-  .badges .badge.blue { background: #0033aa; }
-  .badges .badge.green { background: #006622; }
-  .badges .badge.purple { background: #550088; }
-  .guestbook {
-    margin: 10px 0;
-  }
-  .guestbook a {
-    font-weight: bold;
-    background: var(--face);
-    border: 2px outset var(--face);
-    padding: 5px 12px;
-    text-decoration: none;
-    color: #000;
-    display: inline-block;
-  }
-  .guestbook a:active { border-style: inset; }
-  .credits {
-    color: var(--ink-dim);
-    margin-top: 10px;
-    line-height: 1.6;
-  }
-
-  /* ---------- lightbox ---------- */
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    background: rgba(0,0,0,0.75);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.15s ease;
-    padding: 16px;
-  }
-  .lightbox.open { opacity: 1; visibility: visible; }
-  .lightbox-inner {
-    max-width: min(92vw, 620px);
-    width: 100%;
-    background: var(--winbg);
-    border: 2px solid #000;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
-  }
-  .lb-titlebar {
-    background: linear-gradient(to bottom, #0a3fa8, #1655cf 45%, #7aa6e8);
-    color: #fff;
-    font-family: var(--sans);
-    font-weight: bold;
-    font-size: 12px;
-    padding: 4px 6px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .lb-titlebar .winbtns { display: flex; gap: 3px; }
-  .lb-titlebar .winbtns span,
-  .lb-close {
-    display: inline-block;
-    width: 17px;
-    height: 15px;
-    background: var(--face);
-    border: 1px solid #000;
-    box-shadow: inset 1px 1px 0 var(--face-hi), inset -1px -1px 0 var(--face-lo);
-    text-align: center;
-    line-height: 13px;
-    font-size: 10px;
-    color: #000;
-    cursor: pointer;
-    padding: 0;
-    font-family: var(--sans);
-  }
-  .lightbox-frame {
-    background: #000;
-    padding: 8px;
-  }
-  .lightbox-frame img {
-    width: 100%;
-    display: block;
-    image-rendering: pixelated;
-    border: 1px solid #444;
-  }
-  .lightbox-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 6px 10px 10px;
-    font-family: var(--sans);
-    font-size: 11px;
-    color: #000;
-  }
-  .lightbox-meta b { color: var(--link-visited); }
-  .lb-nav {
-    position: fixed;
-    background: var(--face);
-    border: 2px outset var(--face);
-    color: #000;
-    cursor: pointer;
-    font-family: var(--sans);
-    font-weight: bold;
-    font-size: 20px;
-    width: 34px;
-    height: 34px;
-    line-height: 30px;
-  }
-  .lb-nav:active { border-style: inset; }
-  .lb-prev { left: 10px; top: 50%; transform: translateY(-50%); }
-  .lb-next { right: 10px; top: 50%; transform: translateY(-50%); }
-  @media (max-width: 560px) {
-    .lb-prev { left: 4px; }
-    .lb-next { right: 4px; }
-  }
-
-  .sr-only {
-    position: absolute;
-    width: 1px; height: 1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-  }
+<title>~*~ Frame Log ~*~ Baosec-Lite Photo Page ~*~</title>
+<style type="text/css">
+  body { background-color: #000044; color: #ffffff; }
+  body, td, div, p { font-family: "Times New Roman", Times, serif; }
+  a:link { color: #00ffff; }
+  a:visited { color: #ff00ff; }
+  a:active { color: #ffff00; }
+  .outer { border: 2px outset #c0c0c0; }
+  .titlebar { border-bottom: 2px solid #000000; }
+  .card { border: 2px outset #c0c0c0; }
+  .cardinner { border: 2px inset #c0c0c0; }
+  .btncell { border: 2px outset #c0c0c0; }
+  .btncell.pressed { border: 2px inset #c0c0c0; }
+  .lcd { font-family: "Courier New", Courier, monospace; }
 </style>
 </head>
-<body>
-<div class="shell">
-  <div class="construction"><span class="blink">&#128679; UNDER CONSTRUCTION &#128679; ALWAYS WILL BE, PROBABLY &#128679;</span></div>
+<body background="images/bg.gif" text="#ffffff" link="#00ffff" vlink="#ff00ff">
 
-  <header class="titlebar">
-    <span>frame_log.exe - photo viewer</span>
-    <span class="winbtns"><span>_</span><span>&#9633;</span><span>X</span></span>
-  </header>
+<center>
 
-  <div class="titlecard">
-    <h1>~*~ Frame Log ~*~</h1>
-    <div class="subtitle">the official baosec&#8209;lite badge-cam photo page</div>
-    <hr>
-  </div>
+<table class="outer" width="560" cellpadding="0" cellspacing="0" bgcolor="#ece9d8" border="0">
+<tr><td>
 
-  <div class="marquee-wrap">
-    <span class="track">Welcome to my photo page!!! &nbsp;&bull;&nbsp; Pics captured LIVE on a DEF CON 34 badge camera &nbsp;&bull;&nbsp; Best viewed in 800x600 &nbsp;&bull;&nbsp; Please sign my guestbook &nbsp;&bull;&nbsp; You are visitor number <span id="marqueeCount">000000</span> &nbsp;&bull;&nbsp; Thanks for stopping by!!! &nbsp;&bull;&nbsp; </span>
-  </div>
+  <table width="100%" cellpadding="3" cellspacing="0" border="0" bgcolor="#ffff00">
+  <tr><td align="center">
+    <blink><font color="#ff0000" size="3"><b>&#128679; UNDER CONSTRUCTION &#128679; ALWAYS WILL BE, PROBABLY &#128679;</b></font></blink>
+  </td></tr>
+  </table>
 
-  <div class="statsbar">
-    <div class="cell">hits<br><span class="counter" id="hitCounter">000000</span></div>
-    <div class="cell">frames<br><b id="count">0</b></div>
-    <div class="cell">format<br><b>256&times;240</b></div>
-  </div>
+  <table width="100%" cellpadding="2" cellspacing="0" border="0" bgcolor="#0a3fa8">
+  <tr>
+    <td><font color="#ffffff" face="Verdana, Arial, sans-serif" size="2"><b>frame_log.exe - photo viewer</b></font></td>
+    <td align="right"><font color="#ffffff" face="Verdana, Arial, sans-serif" size="2">[_][&#9633;][X]</font></td>
+  </tr>
+  </table>
 
-  <main id="feed"></main>
+  <table width="100%" cellpadding="10" cellspacing="0" border="0" bgcolor="#ece9d8">
+  <tr><td align="center">
+    <font size="7" face="Times New Roman, serif"><b>
+    <font color="#ff0000">~</font><font color="#ff9900">*</font><font color="#33cc00">~</font>
+    <font color="#0099ff"> Frame </font><font color="#cc00ff">Log </font>
+    <font color="#ff0000">~</font><font color="#ff9900">*</font><font color="#33cc00">~</font>
+    </b></font>
+    <br>
+    <font size="2" face="Verdana, Arial, sans-serif" color="#444444">the official baosec&#8209;lite badge&#8209;cam photo page</font>
+    <br><br>
+    <hr size="4" width="92%" noshade color="#ff9900">
+  </td></tr>
+  </table>
 
-  <div class="webring">
-    <div class="nav">&larr; Previous Site &nbsp;|&nbsp; &#128256; Random &nbsp;|&nbsp; Next Site &rarr;<br>~ member of the Badge-Cam Web Ring ~</div>
-    <div class="badges">
-      <span class="badge blue">Best viewed in Netscape 4.0</span>
-      <span class="badge green">800&times;600</span>
-      <span class="badge">Valid HTML 3.2!</span>
-      <span class="badge purple">No Java required</span>
-    </div>
-    <div class="guestbook">
-      <a href="#" id="guestbookLink">&#9997;&#65039; Sign my Guestbook!</a>
-    </div>
-    <div class="credits">
-      Pulled over USB-CDC from a DEF CON 34 badge (Baochip Baosec&#8209;lite).<br>
-      &copy; forever &middot; this page is a labor of love &middot; e-mail the webmaster
-    </div>
-  </div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td bgcolor="#000000">
+    <marquee scrollamount="4"><font class="lcd" color="#00ff66" size="3">Welcome to my photo page!!! &nbsp;&bull;&nbsp; Pics captured LIVE on a DEF CON 34 badge camera &nbsp;&bull;&nbsp; Best viewed at 800x600 &nbsp;&bull;&nbsp; Please sign my guestbook &nbsp;&bull;&nbsp; You are visitor number <span id="marqueeCount">000000</span> &nbsp;&bull;&nbsp; Thanks for stopping by!!! &nbsp;&bull;&nbsp;</font></marquee>
+  </td></tr>
+  </table>
+
+  <table width="100%" cellpadding="6" cellspacing="6" border="0" bgcolor="#ece9d8">
+  <tr>
+    <td width="33%" align="center" class="cardinner" bgcolor="#c0c0c0">
+      <font size="1" face="Verdana, Arial, sans-serif">hits</font><br>
+      <font class="lcd" color="#00ff66" size="4" id="hitCounterFont">000000</font>
+    </td>
+    <td width="33%" align="center" class="cardinner" bgcolor="#c0c0c0">
+      <font size="1" face="Verdana, Arial, sans-serif">frames</font><br>
+      <font size="4"><b id="count">0</b></font>
+    </td>
+    <td width="33%" align="center" class="cardinner" bgcolor="#c0c0c0">
+      <font size="1" face="Verdana, Arial, sans-serif">format</font><br>
+      <font size="4"><b>256x240</b></font>
+    </td>
+  </tr>
+  </table>
+
+  <table width="100%" cellpadding="4" cellspacing="0" border="0" bgcolor="#ece9d8">
+  <tr><td id="feed"></td></tr>
+  </table>
+
+  <table width="100%" cellpadding="10" cellspacing="0" border="0" bgcolor="#ece9d8">
+  <tr><td align="center">
+    <hr size="2" width="90%" color="#808080">
+    <font size="2" face="Verdana, Arial, sans-serif"><b>
+    &larr; <a href="#">Previous Site</a> &nbsp;|&nbsp; &#128256; <a href="#">Random</a> &nbsp;|&nbsp; <a href="#">Next Site</a> &rarr;
+    <br>~ member of the Badge&#8209;Cam Web Ring ~
+    </b></font>
+    <br><br>
+    <table cellpadding="0" cellspacing="4" border="0"><tr>
+      <td bgcolor="#000000"><font class="lcd" color="#ffffff" size="1">&nbsp;Best&nbsp;viewed&nbsp;in&nbsp;Netscape&nbsp;4.0&nbsp;</font></td>
+      <td bgcolor="#003300"><font class="lcd" color="#ffffff" size="1">&nbsp;800x600&nbsp;</font></td>
+      <td bgcolor="#000066"><font class="lcd" color="#ffffff" size="1">&nbsp;Valid&nbsp;HTML&nbsp;3.2!&nbsp;</font></td>
+      <td bgcolor="#330033"><font class="lcd" color="#ffffff" size="1">&nbsp;No&nbsp;Java&nbsp;required&nbsp;</font></td>
+    </tr></table>
+    <br>
+    <table class="btncell" cellpadding="5" cellspacing="0" border="0" bgcolor="#c0c0c0"><tr><td>
+      <a href="#" id="guestbookLink"><font color="#000000" face="Verdana, Arial, sans-serif" size="2"><b>&#9997;&#65039; Sign my Guestbook!</b></font></a>
+    </td></tr></table>
+    <br>
+    <font size="1" face="Verdana, Arial, sans-serif" color="#444444">
+    Pulled over USB&#8209;CDC from a DEF CON 34 badge (Baochip Baosec&#8209;lite).<br>
+    &copy; forever &middot; this page is a labor of love &middot; e&#8209;mail the webmaster
+    </font>
+  </td></tr>
+  </table>
+
+</td></tr>
+</table>
+
+</center>
+
+<div id="lightbox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:#000000; text-align:center; z-index:50;">
+  <table align="center" cellpadding="0" cellspacing="0" border="0" width="480" style="margin-top:40px;">
+  <tr><td>
+    <table width="100%" cellpadding="2" cellspacing="0" border="0" bgcolor="#0a3fa8">
+    <tr>
+      <td><font color="#ffffff" face="Verdana, Arial, sans-serif" size="2"><b>frame_log.exe - viewer.gif</b></font></td>
+      <td align="right">
+        <a href="#" id="lbClose"><font color="#ffffff" face="Verdana, Arial, sans-serif" size="2"><b>[X]</b></font></a>
+      </td>
+    </tr>
+    </table>
+    <table width="100%" cellpadding="8" cellspacing="0" border="0" bgcolor="#000000">
+    <tr><td align="center">
+      <img id="lbImg" src="" width="440" alt="" border="0">
+    </td></tr>
+    </table>
+    <table width="100%" cellpadding="4" cellspacing="0" border="0" bgcolor="#ece9d8">
+    <tr>
+      <td><font size="2" face="Verdana, Arial, sans-serif">slot <b id="lbSlot">00</b></font></td>
+      <td align="center"><font size="2" face="Verdana, Arial, sans-serif" id="lbTime"></font></td>
+      <td align="right"><font size="2" face="Verdana, Arial, sans-serif" id="lbSize"></font></td>
+    </tr>
+    </table>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="left"><a href="#" id="lbPrev"><font size="5">&laquo; prev</font></a></td>
+      <td align="right"><a href="#" id="lbNext"><font size="5">next &raquo;</font></a></td>
+    </tr>
+    </table>
+  </td></tr>
+  </table>
 </div>
 
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Frame viewer">
-  <div class="lightbox-inner">
-    <div class="lb-titlebar">
-      <span>frame_log.exe - viewer.gif</span>
-      <span class="winbtns">
-        <button class="lb-close" id="lbClose" aria-label="Close viewer">X</button>
-      </span>
-    </div>
-    <div class="lightbox-frame">
-      <img id="lbImg" src="" alt="">
-    </div>
-    <div class="lightbox-meta">
-      <span>slot <b id="lbSlot">00</b></span>
-      <span id="lbTime"></span>
-      <span id="lbSize"></span>
-    </div>
-  </div>
-  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous frame">&lsaquo;</button>
-  <button class="lb-nav lb-next" id="lbNext" aria-label="Next frame">&rsaquo;</button>
-</div>
+<script type="text/javascript">
+<!--
+var PHOTOS = [{"slot": 2, "size_kb": 43.5, "time": "Aug 13", "data": "images/photo_2.png"}, {"slot": 3, "size_kb": 111.5, "time": "Aug 13", "data": "images/photo_3.png"}, {"slot": 4, "size_kb": 52.7, "time": "Aug 13", "data": "images/photo_4.png"}, {"slot": 5, "size_kb": 73.7, "time": "Aug 13", "data": "images/photo_5.png"}, {"slot": 6, "size_kb": 74.3, "time": "Aug 13", "data": "images/photo_6.png"}, {"slot": 7, "size_kb": 64.7, "time": "Aug 13", "data": "images/photo_7.png"}, {"slot": 8, "size_kb": 81.4, "time": "Aug 13", "data": "images/photo_8.png"}, {"slot": 9, "size_kb": 58.4, "time": "Aug 13", "data": "images/photo_9.png"}, {"slot": 10, "size_kb": 67.4, "time": "Aug 13", "data": "images/photo_10.png"}];
 
-<script>
-  const PHOTOS = [{"slot": 2, "size_kb": 43.5, "time": "Aug 13", "data": "images/photo_2.png"}, {"slot": 3, "size_kb": 111.5, "time": "Aug 13", "data": "images/photo_3.png"}, {"slot": 4, "size_kb": 52.7, "time": "Aug 13", "data": "images/photo_4.png"}, {"slot": 5, "size_kb": 73.7, "time": "Aug 13", "data": "images/photo_5.png"}, {"slot": 6, "size_kb": 74.3, "time": "Aug 13", "data": "images/photo_6.png"}, {"slot": 7, "size_kb": 64.7, "time": "Aug 13", "data": "images/photo_7.png"}, {"slot": 8, "size_kb": 81.4, "time": "Aug 13", "data": "images/photo_8.png"}, {"slot": 9, "size_kb": 58.4, "time": "Aug 13", "data": "images/photo_9.png"}, {"slot": 10, "size_kb": 67.4, "time": "Aug 13", "data": "images/photo_10.png"}];
-
-  const LIKE_KEY = "frame_log_likes";
-  function getLikes() {
-    try { return JSON.parse(localStorage.getItem(LIKE_KEY) || "{}"); }
-    catch (e) { return {}; }
+function setCookie(name, value, days) {
+  var expires = "";
+  if (days) {
+    var date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toGMTString();
   }
-  function setLiked(slot, val) {
-    const likes = getLikes();
-    likes[slot] = val;
-    try { localStorage.setItem(LIKE_KEY, JSON.stringify(likes)); } catch (e) {}
+  document.cookie = name + "=" + value + expires + "; path=/";
+}
+function getCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == " ") { c = c.substring(1, c.length); }
+    if (c.indexOf(nameEQ) == 0) { return c.substring(nameEQ.length, c.length); }
   }
+  return null;
+}
 
-  // fake but genuinely-incrementing hit counter, LCD-odometer style
-  (function () {
-    const HIT_KEY = "frame_log_hits";
-    let hits = 133700;
-    try { hits = parseInt(localStorage.getItem(HIT_KEY), 10) || hits; } catch (e) {}
-    hits += 1;
-    try { localStorage.setItem(HIT_KEY, String(hits)); } catch (e) {}
-    const padded = String(hits).padStart(6, "0");
-    document.getElementById("hitCounter").textContent = padded;
-    document.getElementById("marqueeCount").textContent = padded;
-  })();
-
-  document.getElementById("guestbookLink").addEventListener("click", (e) => {
-    e.preventDefault();
-    alert("Guestbook coming soon (or never)! This is a Web 1.0 page, we don't do databases here.");
-  });
-
-  const feed = document.getElementById("feed");
-  document.getElementById("count").textContent = PHOTOS.length;
-
-  const likes = getLikes();
-
-  PHOTOS.forEach((p, idx) => {
-    const card = document.createElement("article");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="card-meta">
-        <span class="idx">Photo ${String(idx + 1).padStart(2,"0")} of ${String(PHOTOS.length).padStart(2,"0")}</span>
-        <span>${p.time}</span>
-      </div>
-      <div class="frame" data-idx="${idx}" tabindex="0" role="button" aria-label="Open frame ${idx + 1} full size">
-        <img src="${p.data}" alt="Camera frame from badge slot ${p.slot}" loading="lazy">
-        <span class="osd">slot ${String(p.slot).padStart(2,"0")}</span>
-        <span class="heart-burst"><span>&#9733;</span></span>
-      </div>
-      <div class="actions">
-        <button class="btn flag-btn" data-slot="${p.slot}" aria-pressed="false" aria-label="Rate this pic">
-          <span class="star">&#9733;</span><span class="like-count">Rate this pic!</span>
-        </button>
-        <a class="btn dl" href="${p.data}" download="badge_frame_${String(p.slot).padStart(2,"0")}.png" aria-label="Download frame">
-          &#128190; Download
-        </a>
-      </div>
-      <div class="caption"><span class="tag">frame_log&gt;</span> ${p.size_kb} KB &middot; captured on&#8209;device, pulled over serial &middot; <i>ain't technology grand?</i></div>
-    `;
-    feed.appendChild(card);
-
-    const flagBtn = card.querySelector(".flag-btn");
-    const countEl = card.querySelector(".like-count");
-    const frameEl = card.querySelector(".frame");
-    const burst = card.querySelector(".heart-burst");
-
-    function paint() {
-      const on = !!likes[p.slot];
-      flagBtn.classList.toggle("active", on);
-      flagBtn.setAttribute("aria-pressed", on ? "true" : "false");
-      countEl.textContent = on ? "Rated! (1 star)" : "Rate this pic!";
-    }
-    paint();
-
-    function toggle(forceOn) {
-      const next = forceOn === undefined ? !likes[p.slot] : forceOn;
-      if (likes[p.slot] === next) {
-        if (!next) return;
-      }
-      likes[p.slot] = next;
-      setLiked(p.slot, next);
-      paint();
-      if (next) {
-        burst.classList.remove("play");
-        requestAnimationFrame(() => burst.classList.add("play"));
-      }
-    }
-
-    flagBtn.addEventListener("click", () => toggle());
-    frameEl.addEventListener("dblclick", (e) => { e.preventDefault(); toggle(true); });
-
-    let lastTap = 0;
-    frameEl.addEventListener("touchend", () => {
-      const now = Date.now();
-      if (now - lastTap < 320) toggle(true);
-      lastTap = now;
-    });
-
-    frameEl.addEventListener("click", (e) => {
-      if (Date.now() - lastTap < 320) return;
-      openLightbox(idx);
-    });
-    frameEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openLightbox(idx); }
-    });
-  });
-
-  // ---------- lightbox ----------
-  const lb = document.getElementById("lightbox");
-  const lbImg = document.getElementById("lbImg");
-  const lbSlot = document.getElementById("lbSlot");
-  const lbTime = document.getElementById("lbTime");
-  const lbSize = document.getElementById("lbSize");
-  let current = 0;
-
-  function renderLightbox() {
-    const p = PHOTOS[current];
-    lbImg.src = p.data;
-    lbImg.alt = `Camera frame from badge slot ${p.slot}, full size`;
-    lbSlot.textContent = String(p.slot).padStart(2, "0");
-    lbTime.textContent = p.time;
-    lbSize.textContent = p.size_kb + " KB";
+function getLikedSlots() {
+  var raw = getCookie("frame_log_likes");
+  if (!raw) { return {}; }
+  var out = {};
+  var parts = raw.split(",");
+  for (var i = 0; i < parts.length; i++) {
+    if (parts[i] !== "") { out[parts[i]] = true; }
   }
-  function openLightbox(idx) {
-    current = idx;
-    renderLightbox();
-    lb.classList.add("open");
-    document.body.style.overflow = "hidden";
-    document.getElementById("lbClose").focus();
+  return out;
+}
+function saveLikedSlots(likes) {
+  var parts = [];
+  for (var key in likes) {
+    if (likes[key]) { parts.push(key); }
   }
-  function closeLightbox() {
-    lb.classList.remove("open");
-    document.body.style.overflow = "";
-  }
-  function step(dir) {
-    current = (current + dir + PHOTOS.length) % PHOTOS.length;
-    renderLightbox();
-  }
+  setCookie("frame_log_likes", parts.join(","), 365);
+}
 
-  document.getElementById("lbClose").addEventListener("click", closeLightbox);
-  document.getElementById("lbPrev").addEventListener("click", () => step(-1));
-  document.getElementById("lbNext").addEventListener("click", () => step(1));
-  lb.addEventListener("click", (e) => { if (e.target === lb) closeLightbox(); });
-  document.addEventListener("keydown", (e) => {
-    if (!lb.classList.contains("open")) return;
-    if (e.key === "Escape") closeLightbox();
-    if (e.key === "ArrowLeft") step(-1);
-    if (e.key === "ArrowRight") step(1);
-  });
+var likes = getLikedSlots();
+
+// hit counter, cookie-based
+var hits = parseInt(getCookie("frame_log_hits"), 10);
+if (!hits || isNaN(hits)) { hits = 133700; }
+hits = hits + 1;
+setCookie("frame_log_hits", String(hits), 3650);
+function padCount(n) {
+  var s = String(n);
+  while (s.length < 6) { s = "0" + s; }
+  return s;
+}
+document.getElementById("hitCounterFont").innerHTML = padCount(hits);
+document.getElementById("marqueeCount").innerHTML = padCount(hits);
+document.getElementById("count").innerHTML = String(PHOTOS.length);
+
+document.getElementById("guestbookLink").onclick = function () {
+  alert("Guestbook coming soon (or never)! This is a Web 1.0 page, we don't do databases here.");
+  return false;
+};
+
+function buildCard(p, idx, total) {
+  var html = "";
+  html += '<table width="100%" cellpadding="6" cellspacing="0" border="0" class="card" bgcolor="#c0c0c0"><tr><td>';
+  html += '<table width="100%" cellpadding="3" cellspacing="0" border="0" bgcolor="#ece9d8" class="cardinner"><tr>';
+  html += '<td><font size="2" face="Verdana, Arial, sans-serif"><b>Photo ' + pad2(idx + 1) + ' of ' + pad2(total) + '</b></font></td>';
+  html += '<td align="right"><font size="2" face="Verdana, Arial, sans-serif">' + p.time + '</font></td>';
+  html += '</tr></table><br>';
+  html += '<a href="#" onclick="openLightbox(' + idx + '); return false;">';
+  html += '<img src="' + p.data + '" width="100%" border="2" alt="Camera frame from badge slot ' + p.slot + '">';
+  html += '</a><br>';
+  html += '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>';
+  html += '<td><font class="lcd" size="1" color="#444444">slot ' + pad2(p.slot) + '</font></td>';
+  html += '</tr></table><br>';
+  html += '<table cellpadding="0" cellspacing="6" border="0"><tr>';
+  html += '<td><table class="btncell" id="flagbtn' + idx + '" cellpadding="4" cellspacing="0" border="0" bgcolor="#c0c0c0"><tr><td>';
+  html += '<a href="#" onclick="toggleLike(' + idx + '); return false;"><font size="2" face="Verdana, Arial, sans-serif" color="#000000"><b><span id="star' + idx + '">&#9734;</span> <span id="ratetext' + idx + '">Rate this pic!</span></b></font></a>';
+  html += '</td></tr></table></td>';
+  html += '<td><table class="btncell" cellpadding="4" cellspacing="0" border="0" bgcolor="#c0c0c0"><tr><td>';
+  html += '<a href="' + p.data + '" download="badge_frame_' + pad2(p.slot) + '.png"><font size="2" face="Verdana, Arial, sans-serif" color="#000000"><b>&#128190; Download</b></font></a>';
+  html += '</td></tr></table></td>';
+  html += '</tr></table>';
+  html += '<br><font size="2" face="Verdana, Arial, sans-serif" color="#444444"><b><font color="#551a8b">frame_log&gt;</font></b> ' + p.size_kb + ' KB &middot; captured on&#8209;device, pulled over serial &middot; <i>ain\'t technology grand?</i></font>';
+  html += '</td></tr></table><br>';
+  return html;
+}
+
+function pad2(n) {
+  var s = String(n);
+  if (s.length < 2) { s = "0" + s; }
+  return s;
+}
+
+function paintLike(idx) {
+  var slot = PHOTOS[idx].slot;
+  var on = !!likes[slot];
+  var star = document.getElementById("star" + idx);
+  var label = document.getElementById("ratetext" + idx);
+  if (star) { star.innerHTML = on ? "&#9733;" : "&#9734;"; }
+  if (label) { label.innerHTML = on ? "Rated! (1 star)" : "Rate this pic!"; }
+}
+
+function toggleLike(idx) {
+  var slot = PHOTOS[idx].slot;
+  likes[slot] = !likes[slot];
+  saveLikedSlots(likes);
+  paintLike(idx);
+}
+
+var feedHtml = "";
+for (var i = 0; i < PHOTOS.length; i++) {
+  feedHtml += buildCard(PHOTOS[i], i, PHOTOS.length);
+}
+document.getElementById("feed").innerHTML = feedHtml;
+for (var j = 0; j < PHOTOS.length; j++) {
+  paintLike(j);
+}
+
+// ---------- lightbox (DHTML popup layer) ----------
+var currentSlide = 0;
+
+function renderLightbox() {
+  var p = PHOTOS[currentSlide];
+  document.getElementById("lbImg").src = p.data;
+  document.getElementById("lbSlot").innerHTML = pad2(p.slot);
+  document.getElementById("lbTime").innerHTML = p.time;
+  document.getElementById("lbSize").innerHTML = p.size_kb + " KB";
+}
+function openLightbox(idx) {
+  currentSlide = idx;
+  renderLightbox();
+  document.getElementById("lightbox").style.display = "block";
+}
+function closeLightbox() {
+  document.getElementById("lightbox").style.display = "none";
+}
+function stepLightbox(dir) {
+  currentSlide = currentSlide + dir;
+  if (currentSlide < 0) { currentSlide = PHOTOS.length - 1; }
+  if (currentSlide >= PHOTOS.length) { currentSlide = 0; }
+  renderLightbox();
+}
+
+document.getElementById("lbClose").onclick = function () { closeLightbox(); return false; };
+document.getElementById("lbPrev").onclick = function () { stepLightbox(-1); return false; };
+document.getElementById("lbNext").onclick = function () { stepLightbox(1); return false; };
+document.onkeydown = function (e) {
+  var key = e ? e.keyCode : window.event.keyCode;
+  if (document.getElementById("lightbox").style.display != "block") { return; }
+  if (key == 27) { closeLightbox(); }
+  if (key == 37) { stepLightbox(-1); }
+  if (key == 39) { stepLightbox(1); }
+};
+//-->
 </script>
+
 </body>
 </html>
